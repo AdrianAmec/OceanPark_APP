@@ -14,8 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.oceanPark.main.model.Player;
 
-import org.w3c.dom.Text;
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class LobbyScreen implements Screen {
     final Main game;
@@ -81,8 +85,12 @@ public class LobbyScreen implements Screen {
 
     }
 
-    public void updatePlayers(){
-        lPlayers.setItems(game.players);
+    public void updatePlayers() {
+        Array<Player> arrayParaLista = new Array<>();
+        for (Player p : game.jugadoresMap.values()) {
+            arrayParaLista.add(p);
+        }
+        lPlayers.setItems(arrayParaLista);
     }
 
     @Override

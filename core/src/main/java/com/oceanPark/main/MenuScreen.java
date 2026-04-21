@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -15,6 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.oceanPark.main.model.Player;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class MenuScreen implements Screen {
     final Main game;
@@ -32,12 +37,13 @@ public class MenuScreen implements Screen {
     ScrollPane scrollPane;
     Label labelPlayerInfo;
 
+    float escala;
+
     public MenuScreen(final Main game){
         this.game=game;
         this.stage= new Stage(game.viewport);
 
-        float escala = game.viewport.getWorldHeight() / Gdx.graphics.getHeight();
-
+        escala = game.escala;
         skin = game.skin;
 
         lPlayers= new List<>(skin);
@@ -69,8 +75,22 @@ public class MenuScreen implements Screen {
         button.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.players.add(new Player(nombre.getText()));
-                updatePlayers();
+                StringWriter writer = new StringWriter();
+                JsonWriter json = new JsonWriter(writer);
+
+                try {
+                    json.object() // Empieza con {
+                        .set("type", "JOIN")
+                        .set("name",nombre.getText());
+
+                    String resultado = writer.toString();
+                    msg(resultado);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+//                updatePlayers();
                 game.setScreen(new GameScreen(game));
             }
         });
@@ -125,11 +145,16 @@ public class MenuScreen implements Screen {
     }
 
     public void msg(String msg){
-        nombre.setText("Mensaje recibido");
+
+        game.socket.send(msg);
     }
 
-    public void updatePlayers(){
-        lPlayers.setItems(game.players);
+    public void updatePlayers() {
+        Array<Player> arrayParaLista = new Array<>();
+        for (Player p : game.jugadoresMap.values()) {
+            arrayParaLista.add(p);
+        }
+        lPlayers.setItems(arrayParaLista);
     }
 
     @Override

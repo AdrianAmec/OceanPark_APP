@@ -1,29 +1,33 @@
 package com.oceanPark.main;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
+import com.oceanPark.main.data.PlayerData;
+import com.oceanPark.main.model.Player;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
-
+    float escala;
+    Label labelTest;
     final Main game;
     Texture backgroundTexture;
+    Texture flechaTexture;
 
     Stage stage;
 
@@ -34,15 +38,114 @@ public class GameScreen implements Screen {
         this.stage=new Stage(game.viewport);
         this.skin=game.skin;
 
+        escala= game.escala;
+
+        //inicializando estilo de labels
+        Label.LabelStyle labelStyle = new Label.LabelStyle();
+        labelStyle.font = new BitmapFont(); // Font per defecte
+        labelStyle.font.setUseIntegerPositions(false);
+        labelTest = new Label("Test",labelStyle);
+
+        labelTest.setScale(4*escala);
+        labelTest.setPosition(250,250);
+
+        //fondo de pantalla
         backgroundTexture = new Texture("background_oceanPark.png");
+
+        //botones en pantalla
+        flechaTexture = new Texture("flecha.png");
         Image fondo = new Image(backgroundTexture);
         fondo.setFillParent(true); // Hace que el fondo ocupe todo el viewport
+
+        TextureRegion flecha = new TextureRegion(flechaTexture);
+        TextureRegion flechaIze = new TextureRegion(flechaTexture);
+        flechaIze.flip(true,false);
+
+        flechaTexture = new Texture("flecha_up.png");
+
+        TextureRegion flechaUp= new TextureRegion(flechaTexture);
+        ImageButton btnDer = new ImageButton(new TextureRegionDrawable(flecha));
+        ImageButton btnIzq = new ImageButton(new TextureRegionDrawable(flechaIze));
+        ImageButton btnUp = new ImageButton(new TextureRegionDrawable(flechaUp));
+
+        btnIzq.getColor().a=0.3f;
+        btnDer.getColor().a=0.3f;
+        btnUp.getColor().a=0.3f;
+
+        btnDer.addListener(new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                labelTest.setText("Moviendo Derecha!!!!");
+                Player player=game.jugadoresMap.get("1");
+                player.updatePoss(player.posX+10f, player.posY);
+
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                labelTest.setText("STOP!!!");
+            }
+        });
+        btnIzq.addListener(new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                labelTest.setText("Moviendo Izquierda!!!!");
+                Player player=game.jugadoresMap.get("1");
+                player.updatePoss(player.posX-10f, player.posY);
+
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                labelTest.setText("STOPP!!!!");
+
+            }
+        });
+
+        btnUp.addListener(new InputListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                labelTest.setText("Saltando!!!!");
+
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                labelTest.setText("Boton Suelto!!!!");
+
+            }
+        });
+
+
+
+        //organizando los controles en pantalla
+        Table controles = new Table();
+        controles.setFillParent(true);
+        controles.bottom().left();
+
+        controles.add(btnIzq).size(100, 100).bottom().pad(20);
+        controles.add(btnDer).size(100, 100).bottom().pad(20);
+        controles.add().expandX();
+        controles.add(btnUp).size(300,300).bottom().right().pad(20);
+        controles.setPosition(10,10);
+
+
+        Texture texture = new Texture("flecha.png");
+        Player player = new Player("test1");
+        game.jugadoresMap.put("1",player);
+        game.jugadoresMap.get("1").currentFrame=texture;
+
+
         stage.addActor(fondo);
 
+        stage.addActor(labelTest);
+        stage.addActor(player);
+        stage.addActor(controles);
         Gdx.input.setInputProcessor(stage);
-
-
-
     }
 
     @Override
@@ -89,25 +192,8 @@ public class GameScreen implements Screen {
     private void draw() {
 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Actualitzar i dibuixar l'Stage
         stage.act(Gdx.graphics.getDeltaTime());
         stage.draw();
-
-
-//      store the worldWidth and worldHeight as local variables for brevity
-//        float worldWidth = game.viewport.getWorldWidth();
-//        float worldHeight = game.viewport.getWorldHeight();
-
-
-
-//        bucketSprite.draw(spriteBatch); // Sprites have their own draw method
-
-//       spriteBatch.draw(bucketTexture, 0, 0, 1, 1); // draw the bucket with width/height of 1 meter
-        // draw each sprite
-//        for (Sprite dropSprite : dropSprites) {
-//            dropSprite.draw(spriteBatch);
-//        }
 
     }
     private void input() {
@@ -128,38 +214,34 @@ public class GameScreen implements Screen {
 
 
     private void logic() {
-        float worldWidth = game.viewport.getWorldWidth();
-        float worldHeight = game.viewport.getWorldHeight();
 
+
+
+    }
+    public void updateAllPlayersPositions(Array<PlayerData> dataFromServer) {
+        for (PlayerData data : dataFromServer) {
+
+            Player p = game.jugadoresMap.get(data.id);
+
+            if (p != null) {
+                p.setPosition(data.x, data.y);
+                p.state = data.state;
+                p.facingRight = data.facingRight;
+            }else {
+                Texture texture = new Texture("flecha.png");
+                Player player = new Player(data.name,data.x, data.y, data.state,data.facingRight,texture);
+                game.jugadoresMap.put(data.id,player);
+                stage.addActor(player);
+
+            }
+        }
     }
 
 
-    void crearSprites(){
-//        Animation<TextureRegion> walk;
-//
-//        spriteSheet = new Texture("perro_sprite.png");
-//        TextureRegion[][] tmp = TextureRegion.split(spriteSheet, 33, 33);
-//
-//        TextureRegion[] walkFrames = new TextureRegion[10];
-//                for (int i = 0; i < 10; i++) {
-//        walkFrames[i] = tmp[0][i];
-//            }
-//        walkAnimation = new Animation<>(0.1f, walkFrames); // 0.1f es la velocidad
-//
-//        TextureRegion[] iddleFrames = new TextureRegion[2];
-//
-//                for (int i = 0; i < 2; i++) {
-//        iddleFrames[i] = tmp[0][i+22];
-//            }
-//
-//        idleAnimation = new Animation<>(0.1f,iddleFrames);
-//
-//        TextureRegion[] jumpFrames = new TextureRegion[2];
-//
-//                for (int i = 0; i < 7; i++) {
-//        jumpFrames[i] = tmp[0][i+25];
-//            }
-//        jumpAnimation = new Animation<>(0.1f,jumpFrames);
+    public void onUserJoined(String id, String nombre) {
+        Player nuevoJugador = new Player(nombre);
+        game.jugadoresMap.put(id, nuevoJugador);
+        stage.addActor(nuevoJugador);
     }
 
 
