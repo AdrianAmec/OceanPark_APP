@@ -28,7 +28,23 @@
           "collapsed": false
         }
       ],
-      "sprites": [],
+      "sprites": [
+        {
+          "name": "mush",
+          "gameplayData": "",
+          "type": "mush",
+          "animationId": "anim_1776791488507743",
+          "x": 102,
+          "y": 386,
+          "width": 32,
+          "height": 32,
+          "imageFile": "media/mushroom iddle_resize.png",
+          "flipX": false,
+          "flipY": false,
+          "depth": 0.0,
+          "groupId": "__main__"
+        }
+      ],
       "spriteGroups": [
         {
           "id": "__main__",
@@ -58,6 +74,15 @@
     }
   ],
   "mediaAssets": [
+    {
+      "name": "cute mushroom walk_2",
+      "fileName": "media/cute mushroom walk_2.png",
+      "mediaType": "spritesheet",
+      "tileWidth": 48,
+      "tileHeight": 48,
+      "selectionColorHex": "#FFCC00",
+      "groupId": "__main__"
+    },
     {
       "name": "tileset_cueva_2",
       "fileName": "media/tileset_cueva_2.png",
@@ -147,6 +172,33 @@
       "tileHeight": 160,
       "selectionColorHex": "#FFCC00",
       "groupId": "__main__"
+    },
+    {
+      "name": "cute mushroom idle_2",
+      "fileName": "media/cute mushroom idle_2.png",
+      "mediaType": "spritesheet",
+      "tileWidth": 48,
+      "tileHeight": 48,
+      "selectionColorHex": "#FFCC00",
+      "groupId": "__main__"
+    },
+    {
+      "name": "mushroom iddle_resize",
+      "fileName": "media/mushroom iddle_resize.png",
+      "mediaType": "spritesheet",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "selectionColorHex": "#FFCC00",
+      "groupId": "__main__"
+    },
+    {
+      "name": "mushroom_iddle_rezise2",
+      "fileName": "media/mushroom_iddle_rezise2.png",
+      "mediaType": "spritesheet",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "selectionColorHex": "#FFCC00",
+      "groupId": "__main__"
     }
   ],
   "mediaGroups": [
@@ -162,8 +214,12 @@
       "color": "green"
     },
     {
-      "name": "Category 2",
+      "name": "Player Death",
       "color": "red"
+    },
+    {
+      "name": "Floor",
+      "color": "yellow"
     }
   ],
   "animationsFile": "animations/animations.json"

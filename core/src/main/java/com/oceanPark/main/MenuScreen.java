@@ -15,11 +15,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.oceanPark.main.model.Player;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Objects;
 
 public class MenuScreen implements Screen {
     final Main game;
@@ -38,6 +41,7 @@ public class MenuScreen implements Screen {
     Label labelPlayerInfo;
 
     float escala;
+
 
     public MenuScreen(final Main game){
         this.game=game;
@@ -75,23 +79,29 @@ public class MenuScreen implements Screen {
         button.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
+
+
                 StringWriter writer = new StringWriter();
                 JsonWriter json = new JsonWriter(writer);
 
                 try {
                     json.object() // Empieza con {
                         .set("type", "JOIN")
-                        .set("name",nombre.getText());
+                        .set("name",nombre.getText())
+                    .pop();
+
+                    json.close();
 
                     String resultado = writer.toString();
-                    msg(resultado);
+                    Gdx.app.log("MSG_TEST_ENVIAR", resultado);
+
+                    game.socket.send(resultado);
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
 //                updatePlayers();
-                game.setScreen(new GameScreen(game));
             }
         });
 
@@ -107,11 +117,12 @@ public class MenuScreen implements Screen {
         //s
 
         Table table = new Table(skin);
+        table.right();
         table.setFillParent(true);
 
-        table.add(labelInfo).size(400,50).padTop(20);
+        table.add(labelInfo).size(160,20).padTop(8);
         table.row();
-        table.add(scrollPane).size(400,200);
+        table.add(scrollPane).size(160,80);
 
 
 //        table.add(labelNombre).size(300,50).padTop(20);
@@ -123,21 +134,41 @@ public class MenuScreen implements Screen {
 //        table.add(labelInfo).size(300,50);
 //        table.row();
 //        table.add(button).size(100,50);
-        labelNombre.setScale(3*escala);
-        labelNombre.setPosition(50,300);
-        nombre.setPosition(50,250);
-        nombre.setScale(3*escala);
-        button.setScale(4*escala);
-        button.setPosition(50,100);
+//        labelNombre.setScale(0.8f*escala);
+//        labelNombre.setPosition(20,112);
+//        nombre.setPosition(20,93);
+//        nombre.setSize(200f * escala, 40f * escala);
+//        button.setSize(100*1.6f*escala,40*1.6f*escala);
+//        button.setPosition(20,37);
+//
+//        table.setScale(0.8f*escala);
+//        table.setPosition(60,18);
 
-        table.setScale(2*escala);
-        table.setPosition(150,50);
+        Table menu = new Table();
+        menu.left();
+        menu.setFillParent(true); // Que ocupe toda la pantalla del uiStage
+
+// Agregamos el Label
+        menu.add(labelNombre).padBottom(10).size(200,20);
+
+        menu.row(); // Nueva fila
+
+// Agregamos el TextField (Aquí definimos el tamaño sin deformar)
+// El método .size(ancho, alto) ajusta la hitbox y el dibujo perfectamente
+        menu.add(nombre).size(200, 40).padBottom(20);
+        menu.row();
+
+// Agregamos el Botón
+        menu.add(button).size(150, 50);
+
+// Lo añadimos al stage de la interfaz
+        stage.addActor(menu);
 
 
 
-        stage.addActor(nombre);
-        stage.addActor(labelNombre);
-        stage.addActor(button);
+//        stage.addActor(nombre);
+//        stage.addActor(labelNombre);
+//        stage.addActor(button);
         stage.addActor(table);
 
 
@@ -146,7 +177,42 @@ public class MenuScreen implements Screen {
 
     public void msg(String msg){
 
-        game.socket.send(msg);
+        JsonValue base = game.lector.parse(msg);
+
+        // Obtener el array "jugadores"
+        String mensaje = base.getString("type");
+        if(mensaje.equals("JOINED")){
+            game.playerId=base.getString("playerId");;
+            game.playerName=base.getString("name");
+            game.setScreen(new GameScreen(game));
+
+        } else if (mensaje.equals("ERROR")) {
+            String info = base.getString("message");
+            labelInfo.setText(info);
+            //game.setScreen(new GameScreen(game));
+
+        }
+//        else if (mensaje.equals("STATE")){
+//            JsonValue players = base.get("players");
+//
+//            for (JsonValue jugador : players) {
+//                String playerId = jugador.getString("id");
+//                Player p = game.jugadoresMap.get(playerId);
+//
+//                if(p==null){
+//
+//
+//
+//                        //Gdx.app.log("player",jugador.toString());
+//                        Player player = new Player(jugador.getString("name"),game.mushPlayer);
+//                        player.posX=jugador.getFloat("x");
+//                        player.posY=jugador.getFloat("y");
+//                        game.jugadoresMap.put(playerId,player);
+//                        updatePlayers();
+//
+//
+//            }
+//        }}
     }
 
     public void updatePlayers() {

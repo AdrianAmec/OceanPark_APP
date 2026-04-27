@@ -14,15 +14,16 @@ public class Player extends Actor {
     public Texture currentFrame;
     Boolean ready;
 
-    public Player(String name) {
+    public Player(String name,Texture texture) {
         this.setName(name);
         this.posX=50;
         this.posY=50;
         this.stateTime = 0;
+        this.setSize(32,32);
         state=States.IDDLE;
         facingRight=false;
         ready=false;
-        currentFrame= new Texture("flecha.png");
+        currentFrame=texture;
 
     }
     public Player(String name,float posX,float posY,States state,boolean facingRight,Texture texture){
@@ -32,6 +33,7 @@ public class Player extends Actor {
         this.state=state;
         this.facingRight=facingRight;
         this.currentFrame=texture;
+        this.setSize(32,32);
     }
 
     public void updatePoss(float x,float y){
@@ -44,7 +46,6 @@ public class Player extends Actor {
         super.act(delta);
         stateTime += delta;
         this.setPosition(posX, posY);
-        this.setSize(150,150);
     }
     @Override
     public void draw(Batch batch, float parentAlpha) {

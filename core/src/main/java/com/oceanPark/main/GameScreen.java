@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -18,25 +17,44 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.oceanPark.main.data.PlayerData;
+import com.oceanPark.main.model.Key;
 import com.oceanPark.main.model.Player;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Objects;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
+    JsonReader lector;
     float escala;
     Label labelTest;
     final Main game;
-    Texture backgroundTexture;
-    Texture flechaTexture;
 
-    Stage stage;
+    Stage stage,worldStage;
 
     Skin skin;
+    private Viewport uiViewport,worldViewport;
 
     public GameScreen(final Main game){
+        uiViewport = new ScreenViewport();
+        worldViewport = new FitViewport(320, 180);
+
         this.game=game;
-        this.stage=new Stage(game.viewport);
+        this.stage=new Stage(uiViewport, game.batch);
+        this.worldStage= new Stage(worldViewport, game.batch);
         this.skin=game.skin;
+
+
+
+        lector = new JsonReader();
 
         escala= game.escala;
 
@@ -46,24 +64,21 @@ public class GameScreen implements Screen {
         labelStyle.font.setUseIntegerPositions(false);
         labelTest = new Label("Test",labelStyle);
 
-        labelTest.setScale(4*escala);
-        labelTest.setPosition(250,250);
+        labelTest.setScale(1.2f*escala);
+        labelTest.setPosition(100,100);
 
         //fondo de pantalla
-        backgroundTexture = new Texture("background_oceanPark.png");
 
         //botones en pantalla
-        flechaTexture = new Texture("flecha.png");
-        Image fondo = new Image(backgroundTexture);
-        fondo.setFillParent(true); // Hace que el fondo ocupe todo el viewport
 
-        TextureRegion flecha = new TextureRegion(flechaTexture);
-        TextureRegion flechaIze = new TextureRegion(flechaTexture);
+
+
+
+        TextureRegion flecha = new TextureRegion(game.flechaTexture);
+        TextureRegion flechaIze = new TextureRegion(game.flechaTexture);
         flechaIze.flip(true,false);
 
-        flechaTexture = new Texture("flecha_up.png");
-
-        TextureRegion flechaUp= new TextureRegion(flechaTexture);
+        TextureRegion flechaUp= new TextureRegion(game.flechaUp);
         ImageButton btnDer = new ImageButton(new TextureRegionDrawable(flecha));
         ImageButton btnIzq = new ImageButton(new TextureRegionDrawable(flechaIze));
         ImageButton btnUp = new ImageButton(new TextureRegionDrawable(flechaUp));
@@ -76,31 +91,27 @@ public class GameScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                labelTest.setText("Moviendo Derecha!!!!");
-                Player player=game.jugadoresMap.get("1");
-                player.updatePoss(player.posX+10f, player.posY);
-
+                move("right","true");
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                labelTest.setText("STOP!!!");
+                move("right","false");
             }
         });
         btnIzq.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                labelTest.setText("Moviendo Izquierda!!!!");
-                Player player=game.jugadoresMap.get("1");
-                player.updatePoss(player.posX-10f, player.posY);
+
+                move("left","true");
 
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                labelTest.setText("STOPP!!!!");
+                move("left","false");
 
             }
         });
@@ -108,15 +119,13 @@ public class GameScreen implements Screen {
         btnUp.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                labelTest.setText("Saltando!!!!");
-
+                move("jump","true");
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                labelTest.setText("Boton Suelto!!!!");
-
+                move("jump","false");
             }
         });
 
@@ -127,25 +136,50 @@ public class GameScreen implements Screen {
         controles.setFillParent(true);
         controles.bottom().left();
 
-        controles.add(btnIzq).size(100, 100).bottom().pad(20);
-        controles.add(btnDer).size(100, 100).bottom().pad(20);
+        controles.add(btnIzq).size(400, 400).bottom().pad(8);
+        controles.add(btnDer).size(400, 400).bottom().pad(8);
         controles.add().expandX();
-        controles.add(btnUp).size(300,300).bottom().right().pad(20);
-        controles.setPosition(10,10);
+        controles.add(btnUp).size(550,550).bottom().right().pad(8);
+        controles.setPosition(4,4);
 
 
-        Texture texture = new Texture("flecha.png");
-        Player player = new Player("test1");
-        game.jugadoresMap.put("1",player);
-        game.jugadoresMap.get("1").currentFrame=texture;
 
+        //pruebas
+        Player player = new Player("asd",game.mushPlayer);
+        player.posX=160;
+        player.posY=930;
+        game.jugadoresMap.put("asd",player);
+        worldStage.addActor(player);
 
-        stage.addActor(fondo);
+        Key key = new Key("1",game.key);
+        key.updatePoss(130,930);
+        worldStage.addActor(key);
+        //pruebas
 
         stage.addActor(labelTest);
-        stage.addActor(player);
         stage.addActor(controles);
         Gdx.input.setInputProcessor(stage);
+    }
+
+    public void move(String direcicon,String b){
+        StringWriter writer = new StringWriter();
+        JsonWriter json = new JsonWriter(writer);
+
+        try {
+            json.object() // Empieza con {
+                .set("type", "MOVE")
+                .set(direcicon,b)
+                .pop();
+            json.close();
+
+            String resultado = writer.toString();
+            Gdx.app.log("MSG_TEST_ENVIAR", resultado);
+
+            game.socket.send(resultado);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -156,9 +190,8 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         // organize code into three methods
-        input();
-        logic();
-        draw();
+        //input();
+        draw(delta);
     }
 
     @Override
@@ -168,9 +201,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
-        game.viewport.update(width, height, true);
-    }
+        worldViewport.update(width, height, false);
+        uiViewport.update(width, height, true);    }
 
     @Override public void pause() {
 
@@ -185,67 +217,92 @@ public class GameScreen implements Screen {
     }
 
     public void msg(String msg){
+        //< {"type":"STATE",
+        //  "players":[
+        //          {"id":"88042af4-034b-4cbe-ac15-8faf3edcf612","name":"ijsdficusbi","x":100,"y":100,"skin":"mew"},
+        //          {"id":"564bb5e1-ef56-4af9-a448-31fa9dd288dc","name":"Player1","x":110,"y":100,"skin":"creeper"}]}
+        JsonValue base = lector.parse(msg);
 
-    }
+        // Obtener el array "jugadores"
+        String mensaje = base.getString("type");
+        if(mensaje.equals("STATE")){
+            JsonValue players = base.get("players");
 
+            for (JsonValue jugador : players) {
+                String playerId = jugador.getString("id");
+                Player p = game.jugadoresMap.get(playerId);
 
-    private void draw() {
+                if(p!=null){
+                    p.posY=jugador.getFloat("y");
+                    p.posX=jugador.getFloat("x");
 
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stage.act(Gdx.graphics.getDeltaTime());
-        stage.draw();
-
-    }
-    private void input() {
-        float speed = 4f;
-        float delta = Gdx.graphics.getDeltaTime();
-
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            //bucketSprite.translateX(speed * delta); // move the bucket right
-        } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            //bucketSprite.translateX(-speed * delta); // move the bucket left
-        }
-        if (Gdx.input.isTouched()) {
-            //touchPos.set(Gdx.input.getX(), Gdx.input.getY()); // Get where the touch happened on screen
-            //viewport.unproject(touchPos); // Convert the units to the world units of the viewport
-            //bucketSprite.setCenterX(touchPos.x); // Change the horizontally centered position of the bucket
-        }
-    }
-
-
-    private void logic() {
-
-
-
-    }
-    public void updateAllPlayersPositions(Array<PlayerData> dataFromServer) {
-        for (PlayerData data : dataFromServer) {
-
-            Player p = game.jugadoresMap.get(data.id);
-
-            if (p != null) {
-                p.setPosition(data.x, data.y);
-                p.state = data.state;
-                p.facingRight = data.facingRight;
-            }else {
-                Texture texture = new Texture("flecha.png");
-                Player player = new Player(data.name,data.x, data.y, data.state,data.facingRight,texture);
-                game.jugadoresMap.put(data.id,player);
-                stage.addActor(player);
-
+                } else {
+                    //Gdx.app.log("player",jugador.toString());
+                    Player player = new Player(jugador.getString("name"),game.mushPlayer);
+                    player.posX=jugador.getFloat("x");
+                    player.posY=jugador.getFloat("y");
+                    game.jugadoresMap.put(playerId,player);
+                    worldStage.addActor(player);
+                }
             }
         }
     }
 
 
-    public void onUserJoined(String id, String nombre) {
-        Player nuevoJugador = new Player(nombre);
-        game.jugadoresMap.put(id, nuevoJugador);
-        stage.addActor(nuevoJugador);
+    private void draw(float delta) {
+//        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClearColor(0.33f, 0.54f, 0.69f, 1); // El backgroundColorHex del JSON
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        worldViewport.apply(true);
+
+        if (game.jugadoresMap.get(game.playerId) != null) {
+            float targetX = game.jugadoresMap.get(game.playerId).posX;
+            float targetY = game.jugadoresMap.get(game.playerId).posY;
+
+            // Redondeamos para evitar el efecto de colores mezclados
+            worldViewport.getCamera().position.set(Math.round(targetX), Math.round(targetY), 0);
+        } else {
+            // Si no hay player, al menos apunta a una zona con bloques según tus logs
+            worldViewport.getCamera().position.set(160, 930, 0);
+        }
+//        worldViewport.getCamera().position.set(160, 930, 0);
+        worldViewport.getCamera().update();
+
+        //Mapa
+        game.batch.setProjectionMatrix(worldViewport.getCamera().combined);
+        game.batch.disableBlending();
+
+        game.batch.begin();
+
+        game.renderMapa(game.batch); // Dibujamos el fondo primero
+
+        game.batch.end();
+        game.batch.enableBlending(); // importante restaurar
+
+
+        // Dibujamos a los Players (worldStage)
+        // Este stage se moverá junto con la cámara
+        worldStage.act(delta);
+        //worldStage.getBatch().disableBlending();
+        worldStage.draw();
+        //worldStage.getBatch().enableBlending();
+
+
+        uiViewport.apply(true);
+
+        // El stage dibuja los Players (Mushroom) que vienen del servidor
+
+        stage.act(delta);
+        stage.draw();
     }
 
 
 
+//    public void onUserJoined(String id, String nombre) {
+//        Player nuevoJugador = new Player(nombre,flechaTexture);
+//        game.jugadoresMap.put(id, nuevoJugador);
+//        stage.addActor(nuevoJugador);
+//    }
 }
 
 

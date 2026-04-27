@@ -285,6 +285,265 @@
           "hitBoxes": []
         }
       ]
+    },
+    {
+      "id": "anim_1776790899992071",
+      "name": "mushroom_Right",
+      "mediaFile": "media/cute mushroom walk_2.png",
+      "startFrame": 0,
+      "endFrame": 4,
+      "fps": 12.0,
+      "loop": true,
+      "groupId": "__main__",
+      "anchorX": 0.4895833333333333,
+      "anchorY": 0.5,
+      "anchorColor": "red",
+      "hitBoxes": [
+        {
+          "id": "__hb_1776790942704916_0",
+          "name": "Hit Box 1",
+          "color": "green",
+          "x": 0.08333333333333333,
+          "y": 0.08333333333333333,
+          "width": 0.8125,
+          "height": 0.8333333333333334
+        }
+      ],
+      "frameRigs": [
+        {
+          "frame": 0,
+          "anchorX": 0.4895833333333333,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": [
+            {
+              "id": "__hb_1776790942704916_0",
+              "name": "Hit Box 1",
+              "color": "green",
+              "x": 0.08333333333333333,
+              "y": 0.08333333333333333,
+              "width": 0.8125,
+              "height": 0.8333333333333334
+            }
+          ]
+        },
+        {
+          "frame": 1,
+          "anchorX": 0.4895833333333333,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": [
+            {
+              "id": "__hb_1776790942704916_0",
+              "name": "Hit Box 1",
+              "color": "green",
+              "x": 0.08333333333333333,
+              "y": 0.08333333333333333,
+              "width": 0.8125,
+              "height": 0.8333333333333334
+            }
+          ]
+        },
+        {
+          "frame": 2,
+          "anchorX": 0.4895833333333333,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": [
+            {
+              "id": "__hb_1776790942704916_0",
+              "name": "Hit Box 1",
+              "color": "green",
+              "x": 0.08333333333333333,
+              "y": 0.08333333333333333,
+              "width": 0.8125,
+              "height": 0.8333333333333334
+            }
+          ]
+        },
+        {
+          "frame": 3,
+          "anchorX": 0.4895833333333333,
+          "anchorY": 0.5104166666666666,
+          "anchorColor": "red",
+          "hitBoxes": [
+            {
+              "id": "__hb_1776790942704916_0",
+              "name": "Hit Box 1",
+              "color": "green",
+              "x": 0.08333333333333333,
+              "y": 0.08333333333333333,
+              "width": 0.8125,
+              "height": 0.8333333333333334
+            }
+          ]
+        },
+        {
+          "frame": 4,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        }
+      ]
+    },
+    {
+      "id": "anim_1776791127329521",
+      "name": "Mushroom_iddle",
+      "mediaFile": "media/cute mushroom idle_2.png",
+      "startFrame": 0,
+      "endFrame": 8,
+      "fps": 12.0,
+      "loop": true,
+      "groupId": "__main__",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "anchorColor": "red",
+      "hitBoxes": [],
+      "frameRigs": [
+        {
+          "frame": 0,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 1,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 2,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 3,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 4,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 5,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 6,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 7,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 8,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        }
+      ]
+    },
+    {
+      "id": "anim_1776791488507743",
+      "name": "mushroom_iddle_32",
+      "mediaFile": "media/mushroom iddle_resize.png",
+      "startFrame": 0,
+      "endFrame": 8,
+      "fps": 12.0,
+      "loop": true,
+      "groupId": "__main__",
+      "anchorX": 0.5,
+      "anchorY": 0.5,
+      "anchorColor": "red",
+      "hitBoxes": [],
+      "frameRigs": [
+        {
+          "frame": 0,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 1,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 2,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 3,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 4,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 5,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 6,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 7,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        },
+        {
+          "frame": 8,
+          "anchorX": 0.5,
+          "anchorY": 0.5,
+          "anchorColor": "red",
+          "hitBoxes": []
+        }
+      ]
     }
   ]
 }
