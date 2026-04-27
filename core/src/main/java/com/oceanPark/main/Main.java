@@ -199,7 +199,7 @@ public class Main extends Game {
                     float drawX = (colIndex * tileW) + offsetX;
 
                     // Esta fórmula alinea el JSON con el mundo de LibGDX    -600 provicional
-                    float drawY = (mapaAlturaTotal - ((rowIndex+1) * tileH)) + (offsetY-600+tileH);
+                    float drawY = (mapaAlturaTotal - ((rowIndex+1) * tileH)) + offsetY;
 
                     int tilesPerRow = tilesetTexture.getWidth() / tileW;
 
