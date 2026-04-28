@@ -1,23 +1,32 @@
 package com.oceanPark.main.model;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.oceanPark.main.data.States;
 
 public class Key extends Actor {
     public float posX,posY;
     public float stateTime;
-    public Texture currentFrame;
+    public TextureRegion currentFrame;
+    public Animation<TextureRegion> animation;
+    public boolean taken;
+    public String holder;
 
 
-    public Key(String name,Texture texture) {
+
+    public Key(String name,Animation<TextureRegion> animation) {
         this.setName(name);
         this.posX=50;
         this.posY=50;
         this.stateTime = 0;
         this.setSize(32,32);
-        currentFrame=texture;
+        this.animation=animation;
+        taken=false;
+        holder="";
+
     }
 
 
@@ -35,6 +44,7 @@ public class Key extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         // Aquí dibujas tu textura o animación
+        currentFrame = animation.getKeyFrame(stateTime);
         batch.draw(currentFrame, getX(), getY(),getWidth(),getHeight());
     }
 

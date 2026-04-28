@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.oceanPark.main.data.PlayerData;
+import com.oceanPark.main.model.Door;
 import com.oceanPark.main.model.Key;
 import com.oceanPark.main.model.Player;
 
@@ -91,27 +92,27 @@ public class GameScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                move("right","true");
+                move("RIGHT","true");
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("right","false");
+                move("RIGHT","false");
             }
         });
         btnIzq.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                move("left","true");
+                move("LEFT","true");
 
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("left","false");
+                move("LEFT","false");
 
             }
         });
@@ -119,13 +120,13 @@ public class GameScreen implements Screen {
         btnUp.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                move("jump","true");
+                move("JUMP","true");
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("jump","false");
+                move("JUMP","false");
             }
         });
 
@@ -144,17 +145,17 @@ public class GameScreen implements Screen {
 
 
 
-        //pruebas
-        Player player = new Player("asd",game.mushPlayer);
-        player.posX=160;
-        player.posY=930;
-        game.jugadoresMap.put("asd",player);
-        worldStage.addActor(player);
-
-        Key key = new Key("1",game.key);
-        key.updatePoss(130,930);
-        worldStage.addActor(key);
-        //pruebas
+//        //pruebas
+//        Player player = new Player("asd",game.mushPlayer);
+//        player.posX=160;
+//        player.posY=930;
+//        game.jugadoresMap.put("asd",player);
+//        worldStage.addActor(player);
+//
+//        Key key = new Key("1",game.key);
+//        key.updatePoss(130,930);
+//        worldStage.addActor(key);
+//        //pruebas
 
         stage.addActor(labelTest);
         stage.addActor(controles);
@@ -226,23 +227,70 @@ public class GameScreen implements Screen {
         // Obtener el array "jugadores"
         String mensaje = base.getString("type");
         if(mensaje.equals("STATE")){
+            //actualizamos jugadores
             JsonValue players = base.get("players");
-
             for (JsonValue jugador : players) {
                 String playerId = jugador.getString("id");
                 Player p = game.jugadoresMap.get(playerId);
-
+                //actualizamos existentes
                 if(p!=null){
                     p.posY=jugador.getFloat("y");
                     p.posX=jugador.getFloat("x");
+                    p.facingRight=jugador.getBoolean("facingRight");
+                    //Gdx.app.log("TEST_right",p.facingRight+" ave");
 
+                    //logica iddle
+                //creamos nuevos
                 } else {
                     //Gdx.app.log("player",jugador.toString());
-                    Player player = new Player(jugador.getString("name"),game.mushPlayer);
+                    Player player = new Player(jugador.getString("name"),game.mapaAnimation.get("Mushroom Right"));
                     player.posX=jugador.getFloat("x");
                     player.posY=jugador.getFloat("y");
                     game.jugadoresMap.put(playerId,player);
                     worldStage.addActor(player);
+                }
+            }
+            //actualizamos mundo
+            JsonValue world = base.get("world");
+            for (JsonValue entity : world) {
+                //actalizamos llaves
+                if(entity.name.equals("key")){
+                    String id = "1";
+                    Float x = entity.getFloat("x");
+                    Float y = entity.getFloat("y");
+                    Key k = game.keyMap.get(id);
+
+                    if(k!=null){
+                        if(k.taken){
+                            Player p = game.jugadoresMap.get(entity.getString("holderID"));
+                            k.updatePoss(p.getX(),p.posY+32);
+                        }else {
+                            k.updatePoss(x,y);
+                        }
+
+                    }else {
+                        Key key = new Key("key",game.mapaAnimation.get("Result Key"));
+                        key.setPosition(x,y);
+                        game.keyMap.put("1",key);
+                    }
+                //actualizamos puertas
+                }else if(entity.name.equals("door")){
+                    String id = "1";
+                    Float x = entity.getFloat("x");
+                    Float y = entity.getFloat("y");
+                    Door d = game.doorMap.get(id);
+                    if(d!=null){
+                        d.open=entity.getBoolean("open");
+                    }else {
+                        //agregar sprites
+                        Door door = new Door();
+                        door.updatePoss(entity.getFloat("x"),entity.getFloat("y"));
+                    }
+                }else if(entity.equals("coins")){
+                    String id = "1";
+                    Float x = entity.getFloat("x");
+                    Float y = entity.getFloat("y");
+                    Door d = game.doorMap.get(id);
                 }
             }
         }

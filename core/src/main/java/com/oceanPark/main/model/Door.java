@@ -7,11 +7,17 @@ public class Door extends Actor{
 
     public float posX,posY;
     public float stateTime;
+    public boolean open;
 
     public Door() {
         this.posX=0;
         this.posY=0;
         this.stateTime = 0;
+        open=false;
+    }
+    public void updatePoss(float x,float y){
+        posX=x;
+        posY=y;
     }
 
     @Override

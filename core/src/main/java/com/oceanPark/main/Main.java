@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -15,6 +16,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.github.czyzby.websocket.WebSocket;
 import com.github.czyzby.websocket.WebSocketAdapter;
 import com.github.czyzby.websocket.WebSockets;
+import com.oceanPark.main.model.Door;
+import com.oceanPark.main.model.Key;
 import com.oceanPark.main.model.Player;
 import java.util.HashMap;
 
@@ -26,8 +29,8 @@ public class Main extends Game {
     final JsonReader lector = new JsonReader();
 
     HashMap<String, Player> jugadoresMap = new HashMap<>();
-//    HashMap<String,Player> KeyMap = new HashMap<>();
-//    HashMap<String,Player> DoorMap = new HashMap<>();
+    HashMap<String, Key> keyMap = new HashMap<>();
+    HashMap<String, Door> doorMap = new HashMap<>();
 
     private final Array<String> queue = new Array<>();
 
@@ -46,6 +49,8 @@ public class Main extends Game {
 
     Texture backgroundTexture;
 
+    HashMap<String,TextureRegion[][]> mapaSprites;
+    HashMap<String, Animation<TextureRegion>> mapaAnimation;
     private JsonValue levelData;
     private Texture tilesetTexture;
     private TextureRegion[][] tilesetRegions;
@@ -60,14 +65,17 @@ public class Main extends Game {
     @Override
     public void create() {
 
+        mapaAnimation= new HashMap<>();
+        mapaSprites = new HashMap<>();
+
         flechaTexture= new Texture("flecha.png");
         flechaUp= new Texture("flecha_up.png");
-        backgroundTexture = new Texture("background_oceanPark.png");
+        //backgroundTexture = new Texture("background_oceanPark.png");
         mushPlayer= new Texture("mushroom_iddle.png");
         key = new Texture("key-rbg.png");
 
         skin = new Skin(Gdx.files.internal("skin/uiskin.json")); // Carregar un Skin per defecte
-        cargarMapaDesdeJson();
+        cargarGameData();
 
 
         socket = WebSockets.newSocket("wss://pico3.ieti.site:443");
@@ -114,7 +122,7 @@ public class Main extends Game {
 
 
 
-        viewport = new FitViewport(320, 180);
+       // viewport = new FitViewport(320, 180);
 //        viewport = new FitViewport(800, 480);
 
         escala = viewport.getWorldHeight() / Gdx.graphics.getHeight();
@@ -156,7 +164,7 @@ public class Main extends Game {
 
         super.render();
     }
-    public void cargarMapaDesdeJson() {
+    public void cargarGameData() {
         JsonReader reader = new JsonReader();
         // 1. Leer el manifiesto principal
         JsonValue root = reader.parse(Gdx.files.internal("game_data.json"));
@@ -164,9 +172,8 @@ public class Main extends Game {
         // 2. Obtener el primer nivel (Ocean World)
         levelData = root.get("levels").get(0);
 
-        // 3. Configurar Viewport según el JSON (320x180)
-        // game.viewport.setWorldSize(levelData.getFloat("viewportWidth"), levelData.getFloat("viewportHeight"));
-
+        // 3. Configurar Viewport
+        viewport= new FitViewport(levelData.getInt("viewportWidth"),levelData.getInt("viewportHeight"));
         // 4. Cargar la capa de Tiles
         JsonValue layer = levelData.get("layers").get(0);
         offsetX = layer.getFloat("x");
@@ -182,6 +189,15 @@ public class Main extends Game {
         // 6. Cargar el mapa de bits (la cuadrícula de IDs)
         // Este archivo contiene un array "data" con los números de cada tile
         tileMapData = reader.parse(Gdx.files.internal(layer.getString("tileMapFile")));
+
+        cargarSprites(root);
+
+
+        //cargar animaciones
+        root = reader.parse(Gdx.files.internal("animations/animations.json"));
+        cargarAnimaciones(root);
+
+
     }
     public void renderMapa(SpriteBatch batch) {
         if (tileMapData == null) return;
@@ -211,6 +227,58 @@ public class Main extends Game {
                 colIndex++;
             }
             rowIndex++;
+        }
+    }
+
+    public void cargarAnimaciones(JsonValue animRoot) {
+
+        JsonValue animations = animRoot.get("animations");
+
+        for (JsonValue animData : animations) {
+            String animName = animData.getString("name");
+            String mediaFile = animData.getString("mediaFile");
+            int start = animData.getInt("startFrame");
+            int end = animData.getInt("endFrame");
+            float fps = animData.getFloat("fps");
+            boolean loop = animData.getBoolean("loop");
+
+            TextureRegion[][] regiones = mapaSprites.get(mediaFile);
+
+            if(regiones==null){
+                Gdx.app.log("TEST_NULL","name: "+animName+"  filename: "+mediaFile);
+
+                continue;
+            }else {
+                Gdx.app.log("TEST_EXIST","name: "+animName+"  filename: "+mediaFile);
+            }
+            Array<TextureRegion> frames = new Array<>();
+            for (int i = start; i <= end; i++) {
+                frames.add(regiones[0][i]);
+            }
+
+            Animation<TextureRegion> anim = new Animation<>(1f / fps, frames);
+            anim.setPlayMode(loop ? Animation.PlayMode.LOOP : Animation.PlayMode.NORMAL);
+
+            mapaAnimation.put(animName, anim);
+        }
+    }
+
+    public void cargarSprites(JsonValue root){
+        //carga sprites
+        JsonValue mediaAssets = root.get("mediaAssets"); //
+        for (JsonValue asset : mediaAssets) {
+            String nombre = asset.getString("name"); //
+            String archivo = asset.getString("fileName"); //
+            int tileW = asset.getInt("tileWidth"); //
+            int tileH = asset.getInt("tileHeight"); //
+            Gdx.app.log("TEST_SPRITE","nombre: "+archivo+ " archivo: "+archivo);
+            // Guardamos las regiones en un mapa para usarlas después por nombre
+            Texture tex = new Texture(Gdx.files.internal(archivo));
+            tex.setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+
+            TextureRegion[][] regions = TextureRegion.split(tex, tileW, tileH);
+
+            mapaSprites.put(archivo, regions);
         }
     }
 }

@@ -1,20 +1,23 @@
 package com.oceanPark.main.model;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.oceanPark.main.data.States;
 
 public class Player extends Actor {
-
     public float posX,posY;
     public float stateTime;
     public States state;
     public boolean facingRight;
-    public Texture currentFrame;
+    private Animation<TextureRegion> animation;
+    private TextureRegion currentFrame;
+
     Boolean ready;
 
-    public Player(String name,Texture texture) {
+    public Player(String name,Animation<TextureRegion> animation) {
         this.setName(name);
         this.posX=50;
         this.posY=50;
@@ -23,18 +26,18 @@ public class Player extends Actor {
         state=States.IDDLE;
         facingRight=false;
         ready=false;
-        currentFrame=texture;
+        this.animation=animation;
 
     }
-    public Player(String name,float posX,float posY,States state,boolean facingRight,Texture texture){
-        this.setName(name);
-        this.posX=posX;
-        this.posY=posY;
-        this.state=state;
-        this.facingRight=facingRight;
-        this.currentFrame=texture;
-        this.setSize(32,32);
-    }
+//    public Player(String name,float posX,float posY,States state,boolean facingRight,Animation<TextureRegion> animation){
+//        this.setName(name);
+//        this.posX=posX;
+//        this.posY=posY;
+//        this.state=state;
+//        this.facingRight=facingRight;
+//        this.animation=animation;
+//        this.setSize(32,32);
+//    }
 
     public void updatePoss(float x,float y){
         posX=x;
@@ -50,6 +53,12 @@ public class Player extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         // Aquí dibujas tu textura o animación
+        currentFrame = animation.getKeyFrame(stateTime);
+        if (facingRight && currentFrame.isFlipX()) {
+            currentFrame.flip(true, false);
+        } else if (!facingRight && !currentFrame.isFlipX()) {
+            currentFrame.flip(true, false);
+        }
         batch.draw(currentFrame, getX(), getY(),getWidth(),getHeight());
     }
 
