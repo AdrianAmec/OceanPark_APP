@@ -62,7 +62,7 @@ public class GameScreen implements Screen {
         this.worldStage= new Stage(worldViewport, game.batch);
         this.skin=game.skin;
 
-
+        worldStage.addActor(game.map);
 
         lector = new JsonReader();
 
@@ -102,8 +102,8 @@ public class GameScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 move("RIGHT",true);
-                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Right"));
-                game.jugadoresMap.get(game.playerId).facingRight=true;
+//                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Right"));
+//                game.jugadoresMap.get(game.playerId).facingRight=true;
 
                 return true;
             }
@@ -111,8 +111,8 @@ public class GameScreen implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 move("RIGHT",false);
-                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
-                game.jugadoresMap.get(game.playerId).facingRight=false;
+//                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
+//                game.jugadoresMap.get(game.playerId).facingRight=false;
 
             }
         });
@@ -121,8 +121,8 @@ public class GameScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 move("LEFT",true);
-                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom  Left"));
-                game.jugadoresMap.get(game.playerId).facingRight=false;
+//                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom  Left"));
+//                game.jugadoresMap.get(game.playerId).facingRight=false;
 
 
                 return true;
@@ -131,8 +131,8 @@ public class GameScreen implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 move("LEFT",false);
-                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
-                game.jugadoresMap.get(game.playerId).facingRight=false;
+//                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
+//                game.jugadoresMap.get(game.playerId).facingRight=false;
 
 
             }
@@ -258,6 +258,12 @@ public class GameScreen implements Screen {
                     p.posY=jugador.getFloat("y");
                     p.posX=jugador.getFloat("x");
                     p.facingRight=jugador.getBoolean("facingRight");
+                    String state = jugador.getString("state", "IDLE");
+                    if (state.equals("RUN")) {
+                        p.setAnimation(game.mapaAnimation.get(p.facingRight ? "Mushroom Right" : "Mushroom  Left"));
+                    } else {
+                        p.setAnimation(game.mapaAnimation.get("Mushroom Idle"));
+                    }
                     //Gdx.app.log("TEST_right",p.facingRight+" ave");
 
                     //logica iddle
@@ -283,7 +289,7 @@ public class GameScreen implements Screen {
 
                     if(k!=null){
                         if(k.taken){
-                            Player p = game.jugadoresMap.get(entity.getString("holderID"));
+                            Player p = game.jugadoresMap.get(entity.getString("holderId"));
                             k.updatePoss(p.getX(),p.posY+32);
                         }else {
                             k.updatePoss(x,y);
@@ -310,7 +316,7 @@ public class GameScreen implements Screen {
                         game.doorMap.put(id,door);
                         worldStage.addActor(door);
                     }
-                }else if(entity.equals("coins")){
+                }else if(entity.name.equals("coins")){
                     for (JsonValue coin : entity) {
                         String id = coin.getString("id");
                         Float x = coin.getFloat("x");
@@ -349,15 +355,15 @@ public class GameScreen implements Screen {
         worldViewport.getCamera().update();
 
         //Mapa
-        game.batch.setProjectionMatrix(worldViewport.getCamera().combined);
-        game.batch.disableBlending();
-
-        game.batch.begin();
-
-        game.renderMapa(game.batch); // Dibujamos el fondo primero
-
-        game.batch.end();
-        game.batch.enableBlending(); // importante restaurar
+        //game.batch.setProjectionMatrix(worldViewport.getCamera().combined);
+//        game.batch.disableBlending();
+//
+//        game.batch.begin();
+//
+//        game.renderMapa(game.batch,worldStage); // Dibujamos el fondo primero
+//
+//        game.batch.end();
+//        game.batch.enableBlending(); // importante restaurar
 
 
         // Dibujamos a los Players (worldStage)

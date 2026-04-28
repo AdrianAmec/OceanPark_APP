@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -19,6 +20,7 @@ import com.github.czyzby.websocket.WebSockets;
 import com.oceanPark.main.model.Coin;
 import com.oceanPark.main.model.Door;
 import com.oceanPark.main.model.Key;
+import com.oceanPark.main.model.Map;
 import com.oceanPark.main.model.Player;
 import java.util.HashMap;
 
@@ -63,6 +65,8 @@ public class Main extends Game {
     private float offsetX, offsetY;
     private int tileW, tileH;
     float viewportYConfig;
+
+    Map map;
 
 
 
@@ -209,39 +213,8 @@ public class Main extends Game {
         root = reader.parse(Gdx.files.internal("animations/animations.json"));
         cargarAnimaciones(root);
 
-
-    }
-    public void renderMapa(SpriteBatch batch) {
-        if (tileMapData == null) return;
-        JsonValue tileMap = tileMapData.get("tileMap");
-
-        // Altura total del mapa: 42 filas * 23px = 966px
-        float mapaAlturaTotal = tileMap.size * tileH;
-
-        int rowIndex = 0;
-        for (JsonValue row : tileMap) {
-            int colIndex = 0;
-            for (JsonValue tile : row) {
-                int tileId = tile.asInt();
-                if (tileId != -1) {
-                    float drawX = (colIndex * tileW) + offsetX;
-
-                    // 2. En el bucle de renderizado:
-                    // Restamos la posición de la fila a la altura total para invertir el eje Y
-                    // Y luego sumamos el offsetY del layer (-75, 0) y el ajuste del Viewport
-                    float drawY = (mapaAlturaTotal - ((rowIndex + 1) * tileH)) + offsetY - viewportYConfig;
-
-                    int tilesPerRow = tilesetTexture.getWidth() / tileW;
-
-                    int tileCol = tileId % tilesPerRow;
-                    int tileRow = tileId / tilesPerRow;
-
-                    batch.draw(tilesetRegions[tileRow][tileCol], drawX, drawY, tileW, tileH);
-                }
-                colIndex++;
-            }
-            rowIndex++;
-        }
+        //cargar mapa
+        map = new Map(levelData,tileMapData,tilesetTexture);
     }
 
     public void cargarAnimaciones(JsonValue animRoot) {
