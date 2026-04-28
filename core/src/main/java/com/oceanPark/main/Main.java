@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.github.czyzby.websocket.WebSocket;
 import com.github.czyzby.websocket.WebSocketAdapter;
 import com.github.czyzby.websocket.WebSockets;
+import com.oceanPark.main.model.Coin;
 import com.oceanPark.main.model.Door;
 import com.oceanPark.main.model.Key;
 import com.oceanPark.main.model.Player;
@@ -31,6 +32,8 @@ public class Main extends Game {
     HashMap<String, Player> jugadoresMap = new HashMap<>();
     HashMap<String, Key> keyMap = new HashMap<>();
     HashMap<String, Door> doorMap = new HashMap<>();
+    HashMap<String, Coin> coinMap = new HashMap<>();
+
 
     private final Array<String> queue = new Array<>();
 
@@ -59,11 +62,14 @@ public class Main extends Game {
     // Offset y configuración del Viewport del JSON
     private float offsetX, offsetY;
     private int tileW, tileH;
+    float viewportYConfig;
 
 
 
     @Override
     public void create() {
+
+        coinMap= new HashMap<>();
 
         mapaAnimation= new HashMap<>();
         mapaSprites = new HashMap<>();
@@ -174,12 +180,18 @@ public class Main extends Game {
 
         // 3. Configurar Viewport
         viewport= new FitViewport(levelData.getInt("viewportWidth"),levelData.getInt("viewportHeight"));
+//        viewport = new FitViewport(500,500);
+
         // 4. Cargar la capa de Tiles
         JsonValue layer = levelData.get("layers").get(0);
         offsetX = layer.getFloat("x");
         offsetY = layer.getFloat("y");
         tileW = layer.getInt("tilesWidth"); // 23
         tileH = layer.getInt("tilesHeight"); // 23
+
+        // 1. Obtén el ViewportY del nivel desde el JSON (es 473 en tu archivo)
+        viewportYConfig = levelData.getFloat("viewportY");
+
 
         // 5. Cargar Textura del Tileset
         tilesetTexture = new Texture(Gdx.files.internal(layer.getString("tilesSheetFile")));
@@ -214,8 +226,10 @@ public class Main extends Game {
                 if (tileId != -1) {
                     float drawX = (colIndex * tileW) + offsetX;
 
-                    // Esta fórmula alinea el JSON con el mundo de LibGDX    -600 provicional
-                    float drawY = (mapaAlturaTotal - ((rowIndex+1) * tileH)) + offsetY;
+                    // 2. En el bucle de renderizado:
+                    // Restamos la posición de la fila a la altura total para invertir el eje Y
+                    // Y luego sumamos el offsetY del layer (-75, 0) y el ajuste del Viewport
+                    float drawY = (mapaAlturaTotal - ((rowIndex + 1) * tileH)) + offsetY - viewportYConfig;
 
                     int tilesPerRow = tilesetTexture.getWidth() / tileW;
 

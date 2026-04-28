@@ -7,24 +7,24 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.oceanPark.main.data.States;
 
-public class Door extends Actor {
+public class Coin extends Actor {
     public float posX,posY;
     public float stateTime;
     public TextureRegion currentFrame;
     public Animation<TextureRegion> animation;
-    public boolean open;
+    public boolean taken;
     public String holder;
 
 
 
-    public Door(String name,Animation<TextureRegion> animation) {
+    public Coin(String name,Animation<TextureRegion> animation, float x, float y) {
         this.setName(name);
-        this.posX=50;
-        this.posY=50;
+        this.posX=x;
+        this.posY=y;
         this.stateTime = 0;
         this.setSize(32,32);
         this.animation=animation;
-        open=false;
+        taken=false;
         holder="";
 
     }

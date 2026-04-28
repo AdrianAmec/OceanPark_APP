@@ -24,6 +24,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.oceanPark.main.data.PlayerData;
+import com.oceanPark.main.model.Coin;
 import com.oceanPark.main.model.Door;
 import com.oceanPark.main.model.Key;
 import com.oceanPark.main.model.Player;
@@ -46,7 +47,8 @@ public class GameScreen implements Screen {
 
     public GameScreen(final Main game){
         uiViewport = new ScreenViewport();
-        worldViewport = new FitViewport(320, 180);
+//        worldViewport = new FitViewport(320, 180);
+        worldViewport = new FitViewport(1000, 1000);
 
         this.game=game;
         this.stage=new Stage(uiViewport, game.batch);
@@ -92,27 +94,27 @@ public class GameScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                move("RIGHT","true");
+                move("RIGHT",true);
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("RIGHT","false");
+                move("RIGHT",false);
             }
         });
         btnIzq.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                move("LEFT","true");
+                move("LEFT",true);
 
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("LEFT","false");
+                move("LEFT",false);
 
             }
         });
@@ -120,13 +122,13 @@ public class GameScreen implements Screen {
         btnUp.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                move("JUMP","true");
+                move("JUMP",true);
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("JUMP","false");
+                move("JUMP",false);
             }
         });
 
@@ -162,7 +164,7 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
     }
 
-    public void move(String direcicon,String b){
+    public void move(String direcicon,boolean b){
         StringWriter writer = new StringWriter();
         JsonWriter json = new JsonWriter(writer);
 
@@ -272,6 +274,7 @@ public class GameScreen implements Screen {
                         Key key = new Key("key",game.mapaAnimation.get("Result Key"));
                         key.setPosition(x,y);
                         game.keyMap.put("1",key);
+                        worldStage.addActor(key);
                     }
                 //actualizamos puertas
                 }else if(entity.name.equals("door")){
@@ -283,14 +286,24 @@ public class GameScreen implements Screen {
                         d.open=entity.getBoolean("open");
                     }else {
                         //agregar sprites
-                        Door door = new Door();
+                        Door door = new Door("1",game.mapaAnimation.get("Result Key"));
                         door.updatePoss(entity.getFloat("x"),entity.getFloat("y"));
+                        game.doorMap.put(id,door);
+                        worldStage.addActor(door);
                     }
                 }else if(entity.equals("coins")){
-                    String id = "1";
-                    Float x = entity.getFloat("x");
-                    Float y = entity.getFloat("y");
-                    Door d = game.doorMap.get(id);
+                    for (JsonValue coin : entity) {
+                        String id = coin.getString("id");
+                        Float x = coin.getFloat("x");
+                        Float y = coin.getFloat("y");
+                        Coin c = game.coinMap.get(id);
+
+                        if(c==null){
+                            Coin moneda = new Coin(id,game.mapaAnimation.get("Leaf Idle"),x,y);
+                            game.coinMap.put(id,moneda);
+                            worldStage.addActor(moneda);
+                        }
+                    }
                 }
             }
         }
