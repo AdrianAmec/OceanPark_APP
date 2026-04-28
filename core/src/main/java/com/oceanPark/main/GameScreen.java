@@ -35,6 +35,13 @@ import java.util.Objects;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GameScreen implements Screen {
+
+
+    //{"type":"STATE",
+    // "players":[{"id":"045cceea-67a8-4a94-88fa-14187b00b4a7","name":"ee","x":80,"y":278,"state":"IDLE","facingRight":true,"onGround":true,"isVisor":false,"hasKey":false}],
+    // "world":{"key":{"x":170,"y":295,"width":24,"height":24,"taken":false,"holderId":null},
+    // "door":{"x":460,"y":340,"width":40,"height":60,"open":false},
+    // "coins":[{"id":"coin_0","x":70,"y":380,"value":10,"isBonus":false},{"id":"coin_1","x":110,"y":380,"value":10,"isBonus":false},{"id":"coin_2","x":150,"y":380,"value":10,"isBonus":false},{"id":"coin_3","x":190,"y":380,"value":10,"isBonus":false},{"id":"coin_4","x":230,"y":380,"value":10,"isBonus":false},{"id":"coin_5","x":270,"y":380,"value":10,"isBonus":false},{"id":"coin_6","x":165,"y":300,"value":10,"isBonus":false},{"id":"coin_7","x":185,"y":300,"value":10,"isBonus":false},{"id":"coin_8","x":370,"y":375,"value":10,"isBonus":false},{"id":"coin_9","x":410,"y":375,"value":10,"isBonus":false},{"id":"coin_10","x":450,"y":375,"value":10,"isBonus":false},{"id":"coin_13","x":480,"y":375,"value":10,"isBonus":false}],"totalCoins":14,"collectedCoins":2,"platforms":[{"x":42,"y":402,"width":246,"height":13,"name":"Suelo1"},{"x":335,"y":401,"width":168,"height":14,"name":"Suelo2"},{"x":150,"y":325,"width":62,"height":14,"name":"Plataforma"},{"x":58,"y":278,"width":47,"height":14,"name":"PlataformaAlta"},{"x":104,"y":278,"width":16,"height":14,"name":"Escalon1"},{"x":120,"y":294,"width":16,"height":14,"name":"Escalon2"},{"x":42,"y":264,"width":16,"height":14,"name":"Escalon3"},{"x":26,"y":249,"width":16,"height":14,"name":"Escalon4"},{"x":134,"y":309,"width":16,"height":14,"name":"Escalon5"}],"deathZones":[{"x":-231,"y":436,"width":1664,"height":153,"name":"Foso"}],"spawnPoints":[{"x":80,"y":370},{"x":130,"y":370},{"x":180,"y":370},{"x":230,"y":370},{"x":280,"y":370},{"x":370,"y":370},{"x":420,"y":370},{"x":470,"y":370}],"playerZone":{"x":25,"y":100,"width":400,"height":400},"levelCompleted":false,"width":2300,"height":1380,"viewportWidth":320,"viewportHeight":180,"backgroundColor":"#568BB1"}}
     JsonReader lector;
     float escala;
     Label labelTest;
@@ -47,8 +54,8 @@ public class GameScreen implements Screen {
 
     public GameScreen(final Main game){
         uiViewport = new ScreenViewport();
-//        worldViewport = new FitViewport(320, 180);
-        worldViewport = new FitViewport(1000, 1000);
+        worldViewport = new FitViewport(320, 180);
+//        worldViewport = new FitViewport(1000, 1000);
 
         this.game=game;
         this.stage=new Stage(uiViewport, game.batch);
@@ -95,12 +102,18 @@ public class GameScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 move("RIGHT",true);
+                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Right"));
+                game.jugadoresMap.get(game.playerId).facingRight=true;
+
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 move("RIGHT",false);
+                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
+                game.jugadoresMap.get(game.playerId).facingRight=false;
+
             }
         });
         btnIzq.addListener(new InputListener(){
@@ -108,6 +121,9 @@ public class GameScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 move("LEFT",true);
+                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom  Left"));
+                game.jugadoresMap.get(game.playerId).facingRight=false;
+
 
                 return true;
             }
@@ -115,6 +131,9 @@ public class GameScreen implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 move("LEFT",false);
+                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
+                game.jugadoresMap.get(game.playerId).facingRight=false;
+
 
             }
         });
@@ -245,7 +264,7 @@ public class GameScreen implements Screen {
                 //creamos nuevos
                 } else {
                     //Gdx.app.log("player",jugador.toString());
-                    Player player = new Player(jugador.getString("name"),game.mapaAnimation.get("Mushroom Right"));
+                    Player player = new Player(jugador.getString("name"),game.mapaAnimation.get("Mushroom Idle"));
                     player.posX=jugador.getFloat("x");
                     player.posY=jugador.getFloat("y");
                     game.jugadoresMap.put(playerId,player);
@@ -271,7 +290,7 @@ public class GameScreen implements Screen {
                         }
 
                     }else {
-                        Key key = new Key("key",game.mapaAnimation.get("Result Key"));
+                        Key key = new Key("key",game.mapaAnimation.get("Leaf Idle"));
                         key.setPosition(x,y);
                         game.keyMap.put("1",key);
                         worldStage.addActor(key);
@@ -286,7 +305,7 @@ public class GameScreen implements Screen {
                         d.open=entity.getBoolean("open");
                     }else {
                         //agregar sprites
-                        Door door = new Door("1",game.mapaAnimation.get("Result Key"));
+                        Door door = new Door("1",game.mapaAnimation.get("Leaf Idle"));
                         door.updatePoss(entity.getFloat("x"),entity.getFloat("y"));
                         game.doorMap.put(id,door);
                         worldStage.addActor(door);

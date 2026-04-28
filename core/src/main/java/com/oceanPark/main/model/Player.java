@@ -17,6 +17,7 @@ public class Player extends Actor {
 
     Boolean ready;
 
+
     public Player(String name,Animation<TextureRegion> animation) {
         this.setName(name);
         this.posX=50;
@@ -29,7 +30,12 @@ public class Player extends Actor {
         this.animation=animation;
 
     }
-//    public Player(String name,float posX,float posY,States state,boolean facingRight,Animation<TextureRegion> animation){
+
+    public void setAnimation(Animation<TextureRegion> animation) {
+        this.animation = animation;
+    }
+
+    //    public Player(String name,float posX,float posY,States state,boolean facingRight,Animation<TextureRegion> animation){
 //        this.setName(name);
 //        this.posX=posX;
 //        this.posY=posY;
@@ -53,12 +59,8 @@ public class Player extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         // Aquí dibujas tu textura o animación
+
         currentFrame = animation.getKeyFrame(stateTime);
-        if (facingRight && currentFrame.isFlipX()) {
-            currentFrame.flip(true, false);
-        } else if (!facingRight && !currentFrame.isFlipX()) {
-            currentFrame.flip(true, false);
-        }
         batch.draw(currentFrame, getX(), getY(),getWidth(),getHeight());
     }
 

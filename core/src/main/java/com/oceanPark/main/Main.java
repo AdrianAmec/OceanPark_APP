@@ -154,7 +154,7 @@ public class Main extends Game {
         synchronized(queue) {
 
             if (queue.size > 0) {
-                Gdx.app.log("MSG_TEST",queue.get(0));
+                //Gdx.app.log("MSG_TEST",queue.get(0));
                 Screen pantallaActual = getScreen();
                 for (String msg : queue) {
 

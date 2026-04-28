@@ -44,6 +44,7 @@ public class Key extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         // Aquí dibujas tu textura o animación
+
         currentFrame = animation.getKeyFrame(stateTime);
         batch.draw(currentFrame, getX(), getY(),getWidth(),getHeight());
     }
