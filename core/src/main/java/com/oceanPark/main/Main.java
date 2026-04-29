@@ -87,8 +87,9 @@ public class Main extends Game {
         skin = new Skin(Gdx.files.internal("skin/uiskin.json")); // Carregar un Skin per defecte
         cargarGameData();
 
+        socket = WebSockets.newSocket("ws://192.168.1.20:3000");
 
-        socket = WebSockets.newSocket("wss://pico3.ieti.site:443");
+//        socket = WebSockets.newSocket("wss://pico3.ieti.site:443");
 
         // 2. Configurar el listener
         socket.addListener(new WebSocketAdapter() {
@@ -158,7 +159,7 @@ public class Main extends Game {
         synchronized(queue) {
 
             if (queue.size > 0) {
-                //Gdx.app.log("MSG_TEST",queue.get(0));
+                Gdx.app.log("MSG_TEST",queue.get(0));
                 Screen pantallaActual = getScreen();
                 for (String msg : queue) {
 
@@ -267,5 +268,9 @@ public class Main extends Game {
 
             mapaSprites.put(archivo, regions);
         }
+    }
+
+    public void cargarEntity(){
+
     }
 }

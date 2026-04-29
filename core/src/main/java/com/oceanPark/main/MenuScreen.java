@@ -18,6 +18,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
+import com.oceanPark.main.model.Coin;
+import com.oceanPark.main.model.Door;
+import com.oceanPark.main.model.Key;
 import com.oceanPark.main.model.Player;
 
 import java.io.IOException;
@@ -181,38 +184,17 @@ public class MenuScreen implements Screen {
 
         // Obtener el array "jugadores"
         String mensaje = base.getString("type");
-        if(mensaje.equals("JOINED")){
-            game.playerId=base.getString("playerId");;
-            game.playerName=base.getString("name");
+        if(mensaje.equals("JOINED")) {
+            game.playerId = base.getString("playerId");
+            ;
+            game.playerName = base.getString("name");
             game.setScreen(new GameScreen(game));
-
         } else if (mensaje.equals("ERROR")) {
             String info = base.getString("message");
             labelInfo.setText(info);
             //game.setScreen(new GameScreen(game));
-
         }
-//        else if (mensaje.equals("STATE")){
-//            JsonValue players = base.get("players");
-//
-//            for (JsonValue jugador : players) {
-//                String playerId = jugador.getString("id");
-//                Player p = game.jugadoresMap.get(playerId);
-//
-//                if(p==null){
-//
-//
-//
-//                        //Gdx.app.log("player",jugador.toString());
-//                        Player player = new Player(jugador.getString("name"),game.mushPlayer);
-//                        player.posX=jugador.getFloat("x");
-//                        player.posY=jugador.getFloat("y");
-//                        game.jugadoresMap.put(playerId,player);
-//                        updatePlayers();
-//
-//
-//            }
-//        }}
+
     }
 
     public void updatePlayers() {

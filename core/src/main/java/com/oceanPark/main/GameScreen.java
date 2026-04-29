@@ -101,7 +101,7 @@ public class GameScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                move("RIGHT",true);
+                move("dir","RIGHT");
 //                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Right"));
 //                game.jugadoresMap.get(game.playerId).facingRight=true;
 
@@ -110,7 +110,7 @@ public class GameScreen implements Screen {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("RIGHT",false);
+                move("dir","NONE");
 //                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
 //                game.jugadoresMap.get(game.playerId).facingRight=false;
 
@@ -120,7 +120,7 @@ public class GameScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
-                move("LEFT",true);
+                move("dir","LEFT");
 //                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom  Left"));
 //                game.jugadoresMap.get(game.playerId).facingRight=false;
 
@@ -130,7 +130,7 @@ public class GameScreen implements Screen {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("LEFT",false);
+                move("dir","NONE");
 //                game.jugadoresMap.get(game.playerId).setAnimation(game.mapaAnimation.get("Mushroom Idle"));
 //                game.jugadoresMap.get(game.playerId).facingRight=false;
 
@@ -141,13 +141,13 @@ public class GameScreen implements Screen {
         btnUp.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                move("JUMP",true);
+                move("jump","true");
                 return true;
             }
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                move("JUMP",false);
+                move("jump","false");
             }
         });
 
@@ -183,7 +183,7 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
     }
 
-    public void move(String direcicon,boolean b){
+    public void move(String direcicon,String b){
         StringWriter writer = new StringWriter();
         JsonWriter json = new JsonWriter(writer);
 
@@ -279,58 +279,58 @@ public class GameScreen implements Screen {
             }
             //actualizamos mundo
             JsonValue world = base.get("world");
-            for (JsonValue entity : world) {
-                //actalizamos llaves
-                if(entity.name.equals("key")){
-                    String id = "1";
-                    Float x = entity.getFloat("x");
-                    Float y = entity.getFloat("y");
-                    Key k = game.keyMap.get(id);
-
-                    if(k!=null){
-                        if(k.taken){
-                            Player p = game.jugadoresMap.get(entity.getString("holderId"));
-                            k.updatePoss(p.getX(),p.posY+32);
-                        }else {
-                            k.updatePoss(x,y);
-                        }
-
-                    }else {
-                        Key key = new Key("key",game.mapaAnimation.get("Leaf Idle"));
-                        key.setPosition(x,y);
-                        game.keyMap.put("1",key);
-                        worldStage.addActor(key);
-                    }
-                //actualizamos puertas
-                }else if(entity.name.equals("door")){
-                    String id = "1";
-                    Float x = entity.getFloat("x");
-                    Float y = entity.getFloat("y");
-                    Door d = game.doorMap.get(id);
-                    if(d!=null){
-                        d.open=entity.getBoolean("open");
-                    }else {
-                        //agregar sprites
-                        Door door = new Door("1",game.mapaAnimation.get("Leaf Idle"));
-                        door.updatePoss(entity.getFloat("x"),entity.getFloat("y"));
-                        game.doorMap.put(id,door);
-                        worldStage.addActor(door);
-                    }
-                }else if(entity.name.equals("coins")){
-                    for (JsonValue coin : entity) {
-                        String id = coin.getString("id");
-                        Float x = coin.getFloat("x");
-                        Float y = coin.getFloat("y");
-                        Coin c = game.coinMap.get(id);
-
-                        if(c==null){
-                            Coin moneda = new Coin(id,game.mapaAnimation.get("Leaf Idle"),x,y);
-                            game.coinMap.put(id,moneda);
-                            worldStage.addActor(moneda);
-                        }
-                    }
-                }
-            }
+//            for (JsonValue entity : world) {
+//                //actalizamos llaves
+//                if(entity.name.equals("key")){
+//                    String id = "1";
+//                    Float x = entity.getFloat("x");
+//                    Float y = entity.getFloat("y");
+//                    Key k = game.keyMap.get(id);
+//
+//                    if(k!=null){
+//                        if(k.taken){
+//                            Player p = game.jugadoresMap.get(entity.getString("holderId"));
+//                            k.updatePoss(p.getX(),p.posY+32);
+//                        }else {
+//                            k.updatePoss(x,y);
+//                        }
+//
+//                    }else {
+//                        Key key = new Key("key",game.mapaAnimation.get("Leaf Idle"));
+//                        key.setPosition(x,y);
+//                        game.keyMap.put("1",key);
+//                        worldStage.addActor(key);
+//                    }
+//                //actualizamos puertas
+//                }else if(entity.name.equals("door")){
+//                    String id = "1";
+//                    Float x = entity.getFloat("x");
+//                    Float y = entity.getFloat("y");
+//                    Door d = game.doorMap.get(id);
+//                    if(d!=null){
+//                        d.open=entity.getBoolean("open");
+//                    }else {
+//                        //agregar sprites
+//                        Door door = new Door("1",game.mapaAnimation.get("Leaf Idle"));
+//                        door.updatePoss(entity.getFloat("x"),entity.getFloat("y"));
+//                        game.doorMap.put(id,door);
+//                        worldStage.addActor(door);
+//                    }
+//                }else if(entity.name.equals("coins")){
+//                    for (JsonValue coin : entity) {
+//                        String id = coin.getString("id");
+//                        Float x = coin.getFloat("x");
+//                        Float y = coin.getFloat("y");
+//                        Coin c = game.coinMap.get(id);
+//
+//                        if(c==null){
+//                            Coin moneda = new Coin(id,game.mapaAnimation.get("Leaf Idle"),x,y);
+//                            game.coinMap.put(id,moneda);
+//                            worldStage.addActor(moneda);
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 

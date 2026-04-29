@@ -24,11 +24,13 @@ public class Map extends Actor {
         this.viewportYConfig = level.getFloat("viewportY"); // 473
 
         this.tilesetRegions = TextureRegion.split(tilesetTexture, tileW, tileH);
-        this.mapaAlturaTotal = tileMap.size * tileH;
+//        this.mapaAlturaTotal = tileMap.size * tileH;
+        this.mapaAlturaTotal = 1380;
 
         // Posición inicial del Actor basada en el offset del layer
-        setX(layer.getFloat("x")); // -75
-        setY(layer.getFloat("y")); // 0
+//        setX(layer.getFloat("x")); // -75
+//        setY(layer.getFloat("y")); // 0
+        setPosition(0,0);
     }
 
     @Override
@@ -47,8 +49,7 @@ public class Map extends Actor {
                     float drawX = getX() + (colIndex * tileW);
 
                     // Fórmula corregida para LibGDX usando el viewportY del JSON
-                    float drawY = getY() + (mapaAlturaTotal - ((rowIndex + 1) * tileH)) - viewportYConfig;
-
+                    float drawY = getY() + ((tileMap.size-1-rowIndex) * tileH);
                     int tilesPerRow = tilesetRegions[0].length;
                     int tileCol = tileId % tilesPerRow;
                     int tileRow = tileId / tilesPerRow;
